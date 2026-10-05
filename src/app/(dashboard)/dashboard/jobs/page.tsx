@@ -433,7 +433,7 @@ export default function JobsPage() {
             <FileText className="h-4 w-4 text-indigo-600" />
           </div>
           <p className="mt-2 text-2xl font-black text-neutral-900">{jobDescriptions.length}</p>
-          <span className="text-[11px] text-neutral-400">table: job_descriptions</span>
+          <span className="text-[11px] text-neutral-400">table: job_descriptions1</span>
         </div>
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
           <div className="flex items-center justify-between">
@@ -443,7 +443,7 @@ export default function JobsPage() {
           <p className="mt-2 text-2xl font-black text-emerald-700">
             {totalMatchedCandidates > 0 ? totalMatchedCandidates : totalCandidatesAcrossJDs}
           </p>
-          <span className="text-[11px] text-neutral-400">table: output</span>
+          <span className="text-[11px] text-neutral-400">table: output1</span>
         </div>
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
           <div className="flex items-center justify-between">
@@ -686,7 +686,7 @@ export default function JobsPage() {
             <div className="flex-1 overflow-y-auto space-y-2">
               {!selectedCandidateJob.matchedCandidates || selectedCandidateJob.matchedCandidates.length === 0 ? (
                 <div className="py-12 text-center text-xs text-neutral-400">
-                  No candidate match scores recorded for this job code in <code className="font-mono">output</code>.
+                  No candidate match scores recorded for this job code in <code className="font-mono">output1</code>.
                 </div>
               ) : (
                 selectedCandidateJob.matchedCandidates.map((c, i) => (

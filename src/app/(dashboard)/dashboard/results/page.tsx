@@ -131,8 +131,11 @@ export default function ResultsDashboard() {
     const assessment = c.assessments[0];
     const percentage = assessment?.percentage || 0;
 
-    const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesJob = selectedJobId === 'ALL' || c.job.id === selectedJobId;
+    const matchesSearch = (c.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesJob =
+      selectedJobId === 'ALL' ||
+      (c.job && c.job.id?.toString() === selectedJobId) ||
+      (c as any).positionId?.toString() === selectedJobId;
 
     let matchesScore = true;
     if (scoreBracket === 'HIGH') matchesScore = percentage >= 80;
@@ -438,7 +441,7 @@ export default function ResultsDashboard() {
                         let candidateQuestions = activeAssessment.questions;
                         if (!candidateQuestions || !Array.isArray(candidateQuestions) || candidateQuestions.length < 10 || !candidateQuestions[0].options) {
                           // Fallback to the first 20 generated MCQs for the job title
-                          candidateQuestions = get150MockQuestions(activeCandidate.job.title).slice(0, 20);
+                          candidateQuestions = get150MockQuestions(activeCandidate.job?.title || (activeCandidate as any).currentJobTitle || 'Engineering Role').slice(0, 20);
                         }
 
                         return (candidateQuestions as any[]).map((q: any, idx: number) => {

@@ -8,27 +8,20 @@ import { Button } from '@/components/ui/button';
 export const revalidate = 0; // Dynamic server page
 
 export default async function DashboardPage() {
-  // Run queries in parallel
+  // Run queries in parallel (reduced from 11 queries down to 5 to protect db connection pool)
   const [
     totalJobs,
     totalCandidates,
-    pendingCount,
-    completedCount,
+    statusGroups,
     avgScoreData,
     recentCandidates,
     jobsList,
   ] = await Promise.all([
     prisma.job.count(),
     prisma.candidate.count(),
-    prisma.candidate.count({
-      where: {
-        assessmentStatus: { in: ['INVITED', 'STARTED'] },
-      },
-    }),
-    prisma.candidate.count({
-      where: {
-        assessmentStatus: { in: ['COMPLETED', 'EVALUATED'] },
-      },
+    prisma.candidate.groupBy({
+      by: ['assessmentStatus'],
+      _count: { _all: true },
     }),
     prisma.assessment.aggregate({
       _avg: {
@@ -55,11 +48,20 @@ export default async function DashboardPage() {
   const avgScore = avgScoreData._avg.score ? Math.round(avgScoreData._avg.score * 10) / 10 : 0;
   const avgPercentage = avgScore ? Math.round(avgScore * 10) : 0;
 
-  // Candidate status distributions
-  const invitedCount = await prisma.candidate.count({ where: { assessmentStatus: 'INVITED' } });
-  const startedCount = await prisma.candidate.count({ where: { assessmentStatus: 'STARTED' } });
-  const compCount = await prisma.candidate.count({ where: { assessmentStatus: 'COMPLETED' } });
-  const evalCount = await prisma.candidate.count({ where: { assessmentStatus: 'EVALUATED' } });
+  // Compute status distributions from single groupBy query
+  const statusCounts: Record<string, number> = {};
+  for (const group of statusGroups) {
+    if (group.assessmentStatus) {
+      statusCounts[group.assessmentStatus] = group._count._all;
+    }
+  }
+
+  const invitedCount = statusCounts['INVITED'] || 0;
+  const startedCount = statusCounts['STARTED'] || 0;
+  const compCount = statusCounts['COMPLETED'] || 0;
+  const evalCount = statusCounts['EVALUATED'] || 0;
+  const pendingCount = invitedCount + startedCount;
+  const completedCount = compCount + evalCount;
 
   const statusMetrics = [
     { name: 'Invited', count: invitedCount, color: 'bg-neutral-300' },
@@ -296,7 +298,7 @@ export default async function DashboardPage() {
               </TableHeader>
               <TableBody>
                 {jobsList.map((j: any) => (
-                  <TableRow key={j.id}>
+                  <TableRow key={j.id.toString()}>
                     <TableCell className="text-xs font-semibold text-neutral-900">
                       <Link href={`/dashboard/jobs`} className="hover:underline">
                         {j.title}

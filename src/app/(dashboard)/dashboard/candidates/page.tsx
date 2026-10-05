@@ -421,7 +421,7 @@ export default function CandidatesPage() {
             <Users className="h-4 w-4 text-indigo-600" />
           </div>
           <p className="mt-2 text-2xl font-black text-neutral-900">{candidates.length}</p>
-          <span className="text-[11px] text-neutral-400">table: candidates</span>
+          <span className="text-[11px] text-neutral-400">table: candidate1</span>
         </div>
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
           <div className="flex items-center justify-between">

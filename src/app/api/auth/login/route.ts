@@ -25,6 +25,7 @@ export async function POST(request: Request) {
 
     const { email, password } = parseResult.data;
     const normalizedEmail = email.trim().toLowerCase();
+    console.log(`[Auth Login] Login attempt for email: ${normalizedEmail}`);
 
     // Search user record (case-insensitive)
     let user = await prisma.user.findFirst({
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
     }
 
     if (!user || !user.passwordHash) {
+      console.warn(`[Auth Login] Failed: User not found for ${normalizedEmail}`);
       return NextResponse.json(
         { error: 'Invalid login credentials' },
         { status: 400 }
@@ -75,6 +77,7 @@ export async function POST(request: Request) {
     }
 
     if (!isMatch) {
+      console.warn(`[Auth Login] Failed: Password mismatch for ${normalizedEmail}`);
       return NextResponse.json(
         { error: 'Invalid login credentials' },
         { status: 400 }
@@ -100,6 +103,8 @@ export async function POST(request: Request) {
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
+
+    console.log(`[Auth Login] Successfully authenticated user: ${user.email} (Role: ${user.role})`);
 
     return NextResponse.json({
       success: true,

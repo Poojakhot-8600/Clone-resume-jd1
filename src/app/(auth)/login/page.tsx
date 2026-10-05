@@ -70,8 +70,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push('/dashboard');
-      router.refresh();
+      window.location.href = '/dashboard';
     } catch (err: unknown) {
       setErrorAlert(err instanceof Error ? err.message : 'Check your credentials and try again.');
       setLoading(false);
