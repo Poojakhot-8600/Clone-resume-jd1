@@ -20,12 +20,10 @@ export const pool =
         : undefined,
     connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 30000,
-    max: 10,
+    max: process.env.NODE_ENV === 'production' ? 5 : 10,
   });
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.pool = pool;
-}
+globalForPrisma.pool = pool;
 
 const adapter = new PrismaPg(pool);
 
@@ -77,4 +75,4 @@ type ExtendedPrismaClient = ReturnType<typeof createPrismaClient>;
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+globalForPrisma.prisma = prisma;
